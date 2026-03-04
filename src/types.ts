@@ -6,7 +6,11 @@ export interface ChartOptions {
   yAxisTitle: string;
   showLegend: boolean;
   showValues: boolean;
+  hideZeroValues: boolean;
+  showGrid: boolean;
   yAxisMax: string;
+  yAxisStep: string;
+  barThickness: string;
   unit: string;
   exportPadding: number;
   colorPalette: string[];

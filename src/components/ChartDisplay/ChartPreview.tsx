@@ -71,9 +71,14 @@ export default function ChartPreview({
 
   const pad = Math.max(0, options.exportPadding);
 
+  const barThickness = options.barThickness !== '' ? Number(options.barThickness) : undefined;
+
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
+    ...(chartType === 'bar' && barThickness !== undefined && {
+      datasets: { bar: { barThickness } },
+    }),
     layout: {
       padding: pad,
     },
@@ -87,7 +92,11 @@ export default function ChartPreview({
         display: options.showLegend,
       },
       datalabels: {
-        display: options.showValues,
+        display: ((ctx: { dataIndex: number; dataset: { data: (number | null)[] } }) => {
+          if (!options.showValues) return false;
+          if (options.hideZeroValues && ctx.dataset.data[ctx.dataIndex] === 0) return false;
+          return true;
+        }) as (context: unknown) => boolean,
         anchor: isPie ? 'center' as const : 'end' as const,
         align: isPie ? 'center' as const : 'top' as const,
         font: { weight: 'bold' as const, size: 12 },
@@ -114,6 +123,9 @@ export default function ChartPreview({
             text: options.xAxisTitle,
             font: { size: 14 },
           },
+          grid: {
+            display: options.showGrid,
+          },
         },
         y: {
           title: {
@@ -121,10 +133,16 @@ export default function ChartPreview({
             text: options.yAxisTitle,
             font: { size: 14 },
           },
+          grid: {
+            display: options.showGrid,
+          },
           ...(options.yAxisMax !== '' && {
             max: Number(options.yAxisMax),
           }),
           ticks: {
+            ...(options.yAxisStep !== '' && {
+              stepSize: Number(options.yAxisStep),
+            }),
             callback: (value: string | number) =>
               options.unit ? `${value} ${options.unit}` : value,
           },

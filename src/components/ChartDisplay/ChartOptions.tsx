@@ -47,35 +47,30 @@ export default function ChartOptions({ options, onChange }: Props) {
           />
         </div>
       </div>
-      <div className="grid grid-cols-4 gap-3 items-end">
-        <div className="flex items-center gap-2 py-2">
-          <input
-            type="checkbox"
-            id="showLegend"
-            checked={options.showLegend}
-            onChange={e =>
-              onChange({ ...options, showLegend: e.target.checked })
-            }
-            className="rounded"
-          />
-          <label htmlFor="showLegend" className="text-sm text-gray-700">
-            Show Legend
-          </label>
-        </div>
-        <div className="flex items-center gap-2 py-2">
-          <input
-            type="checkbox"
-            id="showValues"
-            checked={options.showValues}
-            onChange={e =>
-              onChange({ ...options, showValues: e.target.checked })
-            }
-            className="rounded"
-          />
-          <label htmlFor="showValues" className="text-sm text-gray-700">
-            Show Values
-          </label>
-        </div>
+      <div className="flex flex-wrap gap-x-5 gap-y-2">
+        {[
+          { id: 'showLegend', label: 'Show Legend', key: 'showLegend' as const },
+          { id: 'showValues', label: 'Show Values', key: 'showValues' as const },
+          { id: 'hideZeroValues', label: 'Hide Zeros', key: 'hideZeroValues' as const },
+          { id: 'showGrid', label: 'Show Grid', key: 'showGrid' as const },
+        ].map(toggle => (
+          <div key={toggle.id} className="flex items-center gap-2">
+            <input
+              type="checkbox"
+              id={toggle.id}
+              checked={options[toggle.key]}
+              onChange={e =>
+                onChange({ ...options, [toggle.key]: e.target.checked })
+              }
+              className="rounded"
+            />
+            <label htmlFor={toggle.id} className="text-sm text-gray-700">
+              {toggle.label}
+            </label>
+          </div>
+        ))}
+      </div>
+      <div className="grid grid-cols-3 gap-3">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Y-Axis Max
@@ -88,6 +83,33 @@ export default function ChartOptions({ options, onChange }: Props) {
             className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Y-Axis Interval
+          </label>
+          <input
+            type="number"
+            value={options.yAxisStep}
+            onChange={e => onChange({ ...options, yAxisStep: e.target.value })}
+            placeholder="Auto"
+            className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Bar Thickness
+          </label>
+          <input
+            type="number"
+            value={options.barThickness}
+            onChange={e => onChange({ ...options, barThickness: e.target.value })}
+            placeholder="Auto"
+            min="1"
+            className="w-full px-3 py-2 border border-gray-300 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+      </div>
+      <div className="grid grid-cols-3 gap-3">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
             Unit
@@ -120,13 +142,13 @@ export default function ChartOptions({ options, onChange }: Props) {
         <label className="block text-sm font-medium text-gray-700 mb-1">
           Color Palette
         </label>
-        <div className="flex gap-2">
+        <div className="flex gap-2 mb-2">
           {Object.entries(COLOR_PALETTES).map(([name, colors]) => (
             <button
               key={name}
-              onClick={() => onChange({ ...options, colorPalette: colors })}
+              onClick={() => onChange({ ...options, colorPalette: [...colors] })}
               className={`flex gap-0.5 p-1.5 rounded border-2 ${
-                options.colorPalette === colors
+                JSON.stringify(options.colorPalette) === JSON.stringify(colors)
                   ? 'border-blue-600'
                   : 'border-gray-200 hover:border-gray-300'
               }`}
@@ -140,6 +162,26 @@ export default function ChartOptions({ options, onChange }: Props) {
                 />
               ))}
             </button>
+          ))}
+        </div>
+        <div className="flex flex-wrap gap-1.5">
+          {options.colorPalette.map((color, i) => (
+            <label key={i} className="relative cursor-pointer" title={`Color ${i + 1}`}>
+              <input
+                type="color"
+                value={color}
+                onChange={e => {
+                  const next = [...options.colorPalette];
+                  next[i] = e.target.value;
+                  onChange({ ...options, colorPalette: next });
+                }}
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+              />
+              <span
+                className="block w-7 h-7 rounded border border-gray-300"
+                style={{ backgroundColor: color }}
+              />
+            </label>
           ))}
         </div>
       </div>
