@@ -11,9 +11,13 @@ export interface ChartOptions {
   yAxisMax: string;
   yAxisStep: string;
   barThickness: string;
+  labelRotation: string;
   unit: string;
   exportPadding: number;
   colorPalette: string[];
+  fontSize: string;
+  fontFamily: string;
+  boldLabels: boolean;
 }
 
 export type Row = Record<string, string | number | null>;

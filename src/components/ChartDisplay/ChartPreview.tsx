@@ -73,6 +73,13 @@ export default function ChartPreview({
   };
 
   const pad = Math.max(0, options.exportPadding);
+  const baseFontSize = Number(options.fontSize) || 12;
+  const fontFamily = options.fontFamily || 'sans-serif';
+  const rotation = Number(options.labelRotation) || 0;
+  // Always use positive rotation so labels angle downward away from the chart area.
+  // Negative rotation angles labels upward into the bars, hiding them.
+  const tickRotation = Math.abs(rotation);
+  const boldWeight = options.boldLabels ? 'bold' as const : undefined;
 
   const chartOptions = {
     responsive: true,
@@ -84,10 +91,13 @@ export default function ChartPreview({
       title: {
         display: !!options.title,
         text: options.title,
-        font: { size: 16 },
+        font: { size: baseFontSize + 4, family: fontFamily, weight: boldWeight },
       },
       legend: {
         display: options.showLegend,
+        labels: {
+          font: { size: baseFontSize, family: fontFamily, weight: boldWeight },
+        },
       },
       datalabels: {
         display: ((ctx: { dataIndex: number; dataset: { data: (number | null)[] } }) => {
@@ -97,7 +107,14 @@ export default function ChartPreview({
         }) as (context: unknown) => boolean,
         anchor: isPie ? 'center' as const : 'end' as const,
         align: isPie ? 'center' as const : 'top' as const,
-        font: { weight: 'bold' as const, size: 12 },
+        offset: 4,
+        clamp: true,
+        clip: true,
+        font: () => ({
+          weight: options.boldLabels ? 'bold' as const : 'normal' as const,
+          size: baseFontSize,
+          family: fontFamily,
+        }),
         color: isPie ? '#fff' : '#374151',
         formatter: (value: number) =>
           options.unit ? `${value} ${options.unit}` : value,
@@ -119,17 +136,22 @@ export default function ChartPreview({
           title: {
             display: !!options.xAxisTitle,
             text: options.xAxisTitle,
-            font: { size: 14 },
+            font: { size: baseFontSize + 2, family: fontFamily, weight: boldWeight },
           },
           grid: {
             display: options.showGrid,
+          },
+          ticks: {
+            maxRotation: tickRotation,
+            minRotation: tickRotation,
+            font: { size: baseFontSize, family: fontFamily, weight: boldWeight },
           },
         },
         y: {
           title: {
             display: !!options.yAxisTitle,
             text: options.yAxisTitle,
-            font: { size: 14 },
+            font: { size: baseFontSize + 2, family: fontFamily, weight: boldWeight },
           },
           grid: {
             display: options.showGrid,
@@ -141,6 +163,7 @@ export default function ChartPreview({
             ...(options.yAxisStep !== '' && {
               stepSize: Number(options.yAxisStep),
             }),
+            font: { size: baseFontSize, family: fontFamily, weight: boldWeight },
             callback: (value: string | number) =>
               options.unit ? `${value} ${options.unit}` : value,
           },
@@ -154,7 +177,7 @@ export default function ChartPreview({
   return (
     <div ref={containerRef} className="h-[400px] lg:h-[500px]">
       <Component
-        key={`${chartType}-${options.barThickness}`}
+        key={`${chartType}-${options.barThickness}-${options.boldLabels}-${baseFontSize}-${fontFamily}`}
         ref={chartRef as never}
         data={chartData}
         options={chartOptions}

@@ -1,3 +1,4 @@
+import { useState, useRef, useEffect } from 'react';
 import {
   DynamicDataSheetGrid,
   textColumn,
@@ -12,15 +13,101 @@ interface Props {
   onColumnsChange: (columns: string[]) => void;
 }
 
+function EditableHeader({
+  name,
+  onRename,
+}: {
+  name: string;
+  onRename: (newName: string) => void;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(name);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (editing) inputRef.current?.focus();
+  }, [editing]);
+
+  const commit = () => {
+    setEditing(false);
+    const trimmed = draft.trim();
+    if (trimmed && trimmed !== name) {
+      onRename(trimmed);
+    } else {
+      setDraft(name);
+    }
+  };
+
+  if (editing) {
+    return (
+      <input
+        ref={inputRef}
+        value={draft}
+        onChange={e => setDraft(e.target.value)}
+        onBlur={commit}
+        onKeyDown={e => {
+          e.stopPropagation();
+          if (e.key === 'Enter') commit();
+          if (e.key === 'Escape') {
+            setDraft(name);
+            setEditing(false);
+          }
+        }}
+        onKeyUp={e => e.stopPropagation()}
+        onKeyPress={e => e.stopPropagation()}
+        onClick={e => e.stopPropagation()}
+        onMouseDown={e => e.stopPropagation()}
+        className="w-full bg-transparent border-none outline-none text-sm font-semibold text-gray-700 px-0"
+        style={{ height: '100%' }}
+      />
+    );
+  }
+
+  return (
+    <span
+      onClick={e => {
+        e.stopPropagation();
+        setEditing(true);
+        setDraft(name);
+      }}
+      className="cursor-pointer text-sm font-semibold text-gray-700 select-none"
+      title="Click to rename"
+    >
+      {name}
+    </span>
+  );
+}
+
 export default function SpreadsheetGrid({
   rows,
   columns,
   onRowsChange,
   onColumnsChange,
 }: Props) {
-  const gridColumns = columns.map(col => ({
+  const handleRename = (index: number, newName: string) => {
+    const oldName = columns[index];
+    if (newName === oldName) return;
+    const newColumns = columns.map((c, i) => (i === index ? newName : c));
+    const newRows = rows.map(r => {
+      const next: Row = {};
+      for (const col of columns) {
+        next[col === oldName ? newName : col] = r[col];
+      }
+      return next;
+    });
+    onColumnsChange(newColumns);
+    onRowsChange(newRows);
+  };
+
+  const gridColumns = columns.map((col, i) => ({
     ...keyColumn(col, textColumn),
-    title: col,
+    title: (
+      <EditableHeader
+        key={col}
+        name={col}
+        onRename={(newName) => handleRename(i, newName)}
+      />
+    ),
     minWidth: 120,
   }));
 
