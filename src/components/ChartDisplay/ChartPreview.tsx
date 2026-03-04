@@ -66,19 +66,17 @@ export default function ChartPreview({
         : options.colorPalette[i % options.colorPalette.length],
       borderWidth: isPie ? 2 : 2,
       tension: 0.3,
+      ...(chartType === 'bar' && options.barThickness !== '' && {
+        barThickness: Number(options.barThickness),
+      }),
     })),
   };
 
   const pad = Math.max(0, options.exportPadding);
 
-  const barThickness = options.barThickness !== '' ? Number(options.barThickness) : undefined;
-
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false,
-    ...(chartType === 'bar' && barThickness !== undefined && {
-      datasets: { bar: { barThickness } },
-    }),
     layout: {
       padding: pad,
     },
@@ -156,6 +154,7 @@ export default function ChartPreview({
   return (
     <div ref={containerRef} className="h-[400px] lg:h-[500px]">
       <Component
+        key={`${chartType}-${options.barThickness}`}
         ref={chartRef as never}
         data={chartData}
         options={chartOptions}

@@ -50,7 +50,7 @@ export default function App() {
             <h1 className="text-xl font-bold text-gray-900">Gen Chart</h1>
           </div>
           <a
-            href="https://github.com/pramodhayyappan/gen-chart"
+            href="https://github.com/pa/gen-chart"
             target="_blank"
             rel="noopener noreferrer"
             className="text-sm text-gray-500 hover:text-gray-700"
