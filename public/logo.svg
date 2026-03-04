@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+  <!-- Vibrant bar chart -->
+  <rect x="4" y="36" width="11" height="24" rx="3" fill="#6366f1"/>
+  <rect x="19" y="24" width="11" height="36" rx="3" fill="#06b6d4"/>
+  <rect x="34" y="14" width="11" height="46" rx="3" fill="#f59e0b"/>
+  <rect x="49" y="6" width="11" height="54" rx="3" fill="#ef4444"/>
+  <!-- Trend line -->
+  <polyline points="9.5,32 24.5,20 39.5,10 54.5,4" stroke="#e879f9" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <!-- Dots on trend line -->
+  <circle cx="9.5" cy="32" r="3" fill="#e879f9"/>
+  <circle cx="24.5" cy="20" r="3" fill="#e879f9"/>
+  <circle cx="39.5" cy="10" r="3" fill="#e879f9"/>
+  <circle cx="54.5" cy="4" r="3" fill="#e879f9"/>
+</svg>
